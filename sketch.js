@@ -58,6 +58,7 @@ function buildPyramid(centreX, baseY, rows, colours){
 // Resize the canvas to the largest size that fits the window, keeping the 9:4 shape
 function fitToWindow(){
   scaleFactor = min(windowWidth / GAME_W, windowHeight / GAME_H);
+  if (!(scaleFactor > 0)) scaleFactor = 1;   // e.g. a hidden tab reports a 0x0 window
   resizeCanvas(floor(GAME_W * scaleFactor), floor(GAME_H * scaleFactor));
 }
 
