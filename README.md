@@ -45,4 +45,5 @@ I first built this in 2020 while learning to code in school. In 2026 I came back
 - replaced 25 hand-written block variables with a `buildPyramid()` function,
 - made the day/night background work over HTTPS, with an offline fallback,
 - stopped the polygon from being dragged after it has been launched,
+- made the game scale to fit any window and fixed the background not covering the canvas,
 - removed debug output and libraries the game never used.

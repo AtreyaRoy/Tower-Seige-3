@@ -13,12 +13,17 @@ var score = 0;
 // Where the polygon rests on the sling
 var SLING_POINT = {x: 100, y: 200};
 
+// The game world is always 900 x 400; the canvas is scaled to fit the window
+var GAME_W = 900, GAME_H = 400;
+var scaleFactor = 1;
+
 function preload(){
   polygon_img = loadImage("images/polygon.png");
 }
 
 function setup() {
-  createCanvas(900,400);
+  createCanvas(GAME_W, GAME_H);
+  fitToWindow();
   engine = Engine.create();
   world = engine.world;
   Engine.run(engine);
@@ -50,11 +55,27 @@ function buildPyramid(centreX, baseY, rows, colours){
   }
 }
 
+// Resize the canvas to the largest size that fits the window, keeping the 9:4 shape
+function fitToWindow(){
+  scaleFactor = min(windowWidth / GAME_W, windowHeight / GAME_H);
+  resizeCanvas(floor(GAME_W * scaleFactor), floor(GAME_H * scaleFactor));
+}
+
+function windowResized(){
+  fitToWindow();
+}
+
+// Mouse position in game coordinates
+function gameMouseX(){ return mouseX / scaleFactor; }
+function gameMouseY(){ return mouseY / scaleFactor; }
+
 function draw() {
+  // Clear the whole canvas every frame, then stretch the picture over it
+  background(56,44,44);
+  scale(scaleFactor);
   if (backgroundImg) {
-    background(backgroundImg);
-  } else {
-    background(56,44,44);   // fallback while the image loads
+    imageMode(CORNER);
+    image(backgroundImg, 0, 0, GAME_W, GAME_H);
   }
 
   noStroke();
@@ -85,7 +106,7 @@ function draw() {
 function mouseDragged(){
   // Only allow dragging while the polygon is still on the sling
   if (slingShot.sling.bodyA) {
-    Matter.Body.setPosition(polygon, {x: mouseX, y: mouseY});
+    Matter.Body.setPosition(polygon, {x: gameMouseX(), y: gameMouseY()});
   }
 }
 
