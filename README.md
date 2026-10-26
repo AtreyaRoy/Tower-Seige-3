@@ -13,7 +13,7 @@ A physics-based slingshot game that runs in the browser. Pull back the polygon, 
 ## How it works
 
 - **Physics:** [Matter.js](https://brm.io/matter-js/) simulates gravity, collisions, friction and restitution for every block.
-- **Slingshot:** a Matter.js `Constraint` (a spring with stiffness 0.04) holds the polygon to a fixed point. Releasing the mouse detaches it, so the stored spring energy launches the polygon.
+- **Slingshot:** a Matter.js `Constraint` (a spring) holds the polygon to the sling point. While you drag, the polygon is frozen at the mouse, up to a maximum pull of 110px. On release it is launched in the opposite direction, at a speed proportional to how far it was pulled back.
 - **Rendering:** [p5.js](https://p5js.org/) draws each body every frame from its physics position and angle.
 - **Day/night background:** at start-up the game asks the World Time API for the current hour in India and picks a light or dark background. If the API can't be reached, it falls back to the computer's own clock.
 
@@ -46,4 +46,5 @@ I first built this in 2020 while learning to code in school. In 2026 I came back
 - made the day/night background work over HTTPS, with an offline fallback,
 - stopped the polygon from being dragged after it has been launched,
 - made the game scale to fit any window and fixed the background not covering the canvas,
+- fixed the polygon wobbling while being dragged, by holding it still and calculating the launch from the pull distance,
 - removed debug output and libraries the game never used.

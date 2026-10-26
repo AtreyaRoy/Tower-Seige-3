@@ -17,6 +17,11 @@ var SLING_POINT = {x: 100, y: 200};
 var GAME_W = 900, GAME_H = 400;
 var scaleFactor = 1;
 
+// Slingshot settings
+var dragging = false;
+var MAX_PULL = 110;       // furthest the polygon can be pulled from the sling (px)
+var LAUNCH_POWER = 0.2;   // launch speed per pixel of pull
+
 function preload(){
   polygon_img = loadImage("images/polygon.png");
 }
@@ -99,24 +104,49 @@ function draw() {
     score += blocks[i].score();
   }
 
+  // While dragging, hold the polygon at the mouse (no build-up of speed, so no wobble)
+  if (dragging) {
+    holdPolygonAtMouse();
+  }
+
   imageMode(CENTER);
   image(polygon_img, polygon.position.x, polygon.position.y, 40, 40);
   slingShot.display();
 }
 
-function mouseDragged(){
-  // Only allow dragging while the polygon is still on the sling
-  if (slingShot.sling.bodyA) {
-    Matter.Body.setPosition(polygon, {x: gameMouseX(), y: gameMouseY()});
+function mousePressed(){
+  // Start a drag only if the polygon is on the sling and the click is on or near it
+  var d = dist(gameMouseX(), gameMouseY(), polygon.position.x, polygon.position.y);
+  if (slingShot.sling.bodyA && d < 60) {
+    dragging = true;
+    Matter.Body.setStatic(polygon, true);   // frozen while held, so physics can't nudge it
   }
 }
 
+// Place the polygon at the mouse, but no further than MAX_PULL from the sling point
+function holdPolygonAtMouse(){
+  var pull = createVector(gameMouseX() - SLING_POINT.x, gameMouseY() - SLING_POINT.y);
+  pull.limit(MAX_PULL);
+  Matter.Body.setPosition(polygon, {x: SLING_POINT.x + pull.x, y: SLING_POINT.y + pull.y});
+  Matter.Body.setVelocity(polygon, {x: 0, y: 0});
+  Matter.Body.setAngularVelocity(polygon, 0);
+}
+
 function mouseReleased(){
+  if (!dragging) return;
+  dragging = false;
+  holdPolygonAtMouse();
+  Matter.Body.setStatic(polygon, false);
+
+  // Launch opposite to the pull: the further back, the faster it flies
+  var vx = (SLING_POINT.x - polygon.position.x) * LAUNCH_POWER;
+  var vy = (SLING_POINT.y - polygon.position.y) * LAUNCH_POWER;
   slingShot.fly();
+  Matter.Body.setVelocity(polygon, {x: vx, y: vy});
 }
 
 function keyPressed(){
-  if (keyCode === 32) {
+  if (keyCode === 32 && !dragging) {
     // Put the polygon back on the sling, at rest, for another shot
     Matter.Body.setPosition(polygon, SLING_POINT);
     Matter.Body.setVelocity(polygon, {x: 0, y: 0});
