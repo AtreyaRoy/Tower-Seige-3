@@ -38,7 +38,7 @@ then open http://localhost:8000.
 
 ## History
 
-I first built this in 2020 while learning to code in school. In 2026 I came back to it with help from Claude, an AI assistant, to:
+I first built this in 2020 while learning to code in school. In 2026 I came back to it with help from Claude, an AI assistant, and:
 
 - fixed the file layout so the game actually loads,
 - fixed scoring, which added points every frame instead of once per block,
