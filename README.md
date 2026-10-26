@@ -35,17 +35,3 @@ python -m http.server
 ```
 
 then open http://localhost:8000.
-
-## History
-
-I first built this in 2020 while learning to code in school. In 2026 I came back to it with help from Claude, an AI assistant, and:
-
-- fixed the file layout so the game actually loads,
-- fixed scoring, which added points every frame instead of once per block,
-- replaced 25 hand-written block variables with a `buildPyramid()` function,
-- made the day/night background work over HTTPS, with an offline fallback,
-- stopped the polygon from being dragged after it has been launched,
-- made the game scale to fit any window and fixed the background not covering the canvas,
-- fixed the polygon wobbling while being dragged, by holding it still and calculating the launch from the pull distance,
-- made the polygon return to the sling automatically after each shot,
-- removed debug output and libraries the game never used.
