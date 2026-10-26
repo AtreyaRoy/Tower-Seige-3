@@ -7,7 +7,7 @@ A physics-based slingshot game that runs in the browser. Pull back the polygon, 
 ## How to play
 
 - **Drag** the polygon away from the sling and **release** to launch it.
-- **Space** puts the polygon back on the sling for another shot.
+- After each shot the polygon returns to the sling by itself, once it stops, leaves the screen, or after 6 seconds. **Space** brings it back straight away.
 - A block counts as knocked out once it is hit hard enough (speed ≥ 3), then fades away.
 
 ## How it works
@@ -47,4 +47,5 @@ I first built this in 2020 while learning to code in school. In 2026 I came back
 - stopped the polygon from being dragged after it has been launched,
 - made the game scale to fit any window and fixed the background not covering the canvas,
 - fixed the polygon wobbling while being dragged, by holding it still and calculating the launch from the pull distance,
+- made the polygon return to the sling automatically after each shot,
 - removed debug output and libraries the game never used.

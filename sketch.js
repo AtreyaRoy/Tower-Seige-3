@@ -22,6 +22,11 @@ var dragging = false;
 var MAX_PULL = 110;       // furthest the polygon can be pulled from the sling (px)
 var LAUNCH_POWER = 0.2;   // launch speed per pixel of pull
 
+// Automatic reset after a shot
+var launchTime = 0;       // millis() when the polygon was launched
+var restFrames = 0;       // how many frames in a row it has been nearly still
+var MAX_SHOT_TIME = 6000; // reset after this long even if it is still moving (ms)
+
 function preload(){
   polygon_img = loadImage("images/polygon.png");
 }
@@ -90,7 +95,7 @@ function draw() {
   text("Drag the polygon to destroy the blocks",300,30);
   text("SCORE : " + score,750,40);
   textSize(12);
-  text("Press Space to get a second chance to play!",620,350);
+  text("The polygon comes back after each shot (or press Space)",560,350);
 
   ground.display();
   fill(200);
@@ -102,6 +107,11 @@ function draw() {
   for (var i = 0; i < blocks.length; i++) {
     blocks[i].display();
     score += blocks[i].score();
+  }
+
+  // Once a shot is over, put the polygon back on the sling automatically
+  if (!slingShot.sling.bodyA && shotIsOver()) {
+    resetPolygon();
   }
 
   // While dragging, hold the polygon at the mouse (no build-up of speed, so no wobble)
@@ -143,15 +153,38 @@ function mouseReleased(){
   var vy = (SLING_POINT.y - polygon.position.y) * LAUNCH_POWER;
   slingShot.fly();
   Matter.Body.setVelocity(polygon, {x: vx, y: vy});
+  launchTime = millis();
+  restFrames = 0;
+}
+
+// A shot is over when the polygon has stopped, left the screen, or taken too long
+function shotIsOver(){
+  var pos = polygon.position;
+  var offScreen = pos.x < -50 || pos.x > GAME_W + 50 || pos.y > GAME_H + 50;
+
+  if (polygon.speed < 0.3) {
+    restFrames++;
+  } else {
+    restFrames = 0;
+  }
+  var stopped = restFrames > 30;   // still for about half a second
+
+  var tooLong = millis() - launchTime > MAX_SHOT_TIME;
+  return offScreen || stopped || tooLong;
+}
+
+// Put the polygon back on the sling, at rest, ready for the next shot
+function resetPolygon(){
+  Matter.Body.setPosition(polygon, SLING_POINT);
+  Matter.Body.setVelocity(polygon, {x: 0, y: 0});
+  Matter.Body.setAngularVelocity(polygon, 0);
+  slingShot.attach(polygon);
 }
 
 function keyPressed(){
+  // Space resets straight away, without waiting for the shot to finish
   if (keyCode === 32 && !dragging) {
-    // Put the polygon back on the sling, at rest, for another shot
-    Matter.Body.setPosition(polygon, SLING_POINT);
-    Matter.Body.setVelocity(polygon, {x: 0, y: 0});
-    Matter.Body.setAngularVelocity(polygon, 0);
-    slingShot.attach(polygon);
+    resetPolygon();
   }
 }
 
